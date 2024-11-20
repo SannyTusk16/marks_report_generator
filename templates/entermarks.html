@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Exam Entry</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: #f5f5f5;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5px;
+            background-color: white;
+        }
+        .top-bar-left {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+        .top-bar-right {
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+            align-items: center;
+        }
+        .top-bar button, .save-btn {
+            height: 35px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .upload-btn {
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            margin-left: 5px;
+            margin-right: 5px;
+            height: 33px;
+            border: none;
+            max-width: 250px;
+            padding: 0px 10px 0px 10px;
+        }
+        .edit-btn {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 5px;
+            margin-left: 5px;
+            margin-right: 5px;
+            height: 33px;
+            border: none;
+            max-width: 250px;
+            padding: 0px 10px 0px 10px;
+        }
+        .exam-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0px 5px;
+        }
+        .search-bar {
+            height: 33px;
+            width: 500px;
+            border-radius: 5px;
+        }
+        .exam-details {
+            margin: 20px 0;
+        }
+        .exam-details h2 {
+            margin-bottom: 10px;
+        }
+        .roll-range {
+            padding: 20px 5px;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+        }
+        .roll-range input {
+            padding: 10px;
+            width: 350px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .table-container {
+            overflow: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        table th, table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        table th {
+            background-color: #f1f1f1;
+        }
+        .student-id, .student-name {
+            width: 150px;
+            text-align: left;
+        }
+        .save-exit-btn {
+            text-align: center;
+            height: 40px;
+            align-items: center;
+            margin-top: 10px;
+            border: none;
+        }
+        .upload-btn:hover {
+            background-color: #009c24;
+        }
+
+        .edit-btn:hover {
+            background-color: #fe2e09;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <button class="upload-btn">Upload</button>
+            <button class="edit-btn">Edit Exam Details</button>
+        </div>
+        <input type="number" class="search-bar" placeholder="Search for a student or examination">
+        <div class="top-bar-right">
+            <button class="upload-btn">Save</button>
+            <i class="glyphicon glyphicon-user"></i>
+            <span>{{facultyName}}</span>
+        </div>
+    </div>
+
+    <div class="exam-header">
+        <div class="exam-details">
+            <h1>{{exam.year}} {{exam.section}}</h1>
+            <p><strong>Date:</strong> {{exam.date}}</p>
+            <p><strong>{{exam.name}}</strong></p>
+        </div>
+    </div>
+
+    <form id="marks-form" action="/save_marks" method="POST">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>StudentID</th>
+                        {% for question in questions %}
+                            <th>Q{{ question.id }} (CO{{ question.co }})</th>
+                        {% endfor %}
+                        <th>CO1</th>
+                        <th>CO2</th>
+                        <th>CO3</th>
+                        <th>CO4</th>
+                        <th>CO5</th>
+                        <th>CO6</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td class="student-id">
+                            <input type="hidden" name="student_ids[]" value="{{ student.studentID }}">
+                            {{ student.studentID }}
+                        </td>
+
+                        <!-- Question marks input fields -->
+                        {% for question in questions %}
+                            <td>
+                                <input type="number" 
+                                    name="marks_{{ student.studentID }}_Q{{ question.id }}" 
+                                    value="{{ student.questions.get(question.id, 0) }}" 
+                                    oninput="updateCOsAndTotal(this, {{ question.co }} , '{{ question.id }}', '{{ student.studentID }}')" 
+                                    class="question-input" 
+                                    data-co="{{ question.co }}">
+                                
+                                <!-- Hidden input for question ID -->
+                                <input type="hidden" name="questionID_{{ question.id }}" value="{{ question.id }}">
+                            </td>
+                        {% endfor %}
+
+                        <!-- CO columns -->
+                        <td><span class="co" data-co="1">{{ student.co1 }}</span></td>
+                        <td><span class="co" data-co="2">{{ student.co2 }}</span></td>
+                        <td><span class="co" data-co="3">{{ student.co3 }}</span></td>
+                        <td><span class="co" data-co="4">{{ student.co4 }}</span></td>
+                        <td><span class="co" data-co="5">{{ student.co5 }}</span></td>
+                        <td><span class="co" data-co="6">{{ student.co6 }}</span></td>
+
+                        <!-- Total marks -->
+                        <td><span class="total">{{ student.co1 + student.co2 + student.co3 + student.co4 + student.co5 + student.co6 }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <input type="hidden" name = "examID" value={{exam.ID}}>
+        <div class="save-exit-btn">
+            <button type="submit" class="upload-btn">SAVE AND EXIT</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function updateCOsAndTotal(questionInput, questionCO) {
+        // Find the row containing the changed input
+        const row = questionInput.closest('tr');
+        
+        // Update the CO value for the given CO number
+        const coSpan = row.querySelector(`.co[data-co="${questionCO}"]`);
+        let coValue = 0;
+        
+        // Sum all question marks with the same CO in this row
+        row.querySelectorAll(`.question-input[data-co="${questionCO}"]`).forEach(input => {
+            coValue += parseFloat(input.value) || 0;
+        });
+        
+        // Update the CO span with the new CO value
+        coSpan.textContent = coValue;
+        
+        // Update the total
+        let total = 0;
+        row.querySelectorAll('.co').forEach(coElement => {
+            total += parseFloat(coElement.textContent) || 0;
+        });
+        
+        // Update the total span
+        row.querySelector('.total').textContent = total;
+    }
+</script>
+
+</body>
+</html>

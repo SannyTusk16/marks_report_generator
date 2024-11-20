@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marks Report Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+        .top-bar button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .upload-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 50%;
+        }
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .co-inputs {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .co-inputs input[type="number"] {
+            width: 48%; /* Adjust width for a two-column layout */
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .modal-content button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-content button:hover {
+            background-color: #218838;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: transparent;
+        }
+        .container {
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: max-content;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+        .top-bar button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .top-bar .upload-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .top-bar .new-exam-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .search-bar {
+            padding: 8px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        table th {
+            background-color: #f2f2f2;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            color: white;
+            font-size: 12px;
+            text-align: center;
+        }
+        .status-pending {
+            background-color: #f0ad4e;
+        }
+        .status-generated {
+            background-color: #5cb85c;
+        }
+        .status-live {
+            background-color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+
+    <center>
+        <h1>Welcome  {{ faculty.name }}</h1>
+    </center>
+
+<div class="container">
+    <div class="top-bar">
+        <div class="container">
+            <div class="top-bar">
+                <button class="upload-btn" id="uploadBtn">New Exam</button>
+                <button class="edit-btn">Edit Exam Details</button>
+                <input type="text" class="search-bar" placeholder="Search for a student or examination">
+            </div>
+        
+            <!-- Add your table or other content here -->
+        </div>
+        
+        <!-- The Modal -->
+        <div id="uploadModal" class="modal">
+            <div class="modal-content">
+                <span id="closeBtn" class="close-btn">&times;</span>
+                <h2>Upload Exam Details</h2>
+                <form id="uploadForm" action="/landingPage/new-exam" method="post">
+                    <div class="co-inputs">
+                        <h3>Year</h3>
+                        <select id="year" name="year" required>
+                            <option value=1>1st Year</option>
+                            <option value=2>2nd Year</option>
+                            <option value=3>3rd Year</option>
+                            <option value=4>4th Year</option>
+                        </select>
+                        
+                        <h3>Section</h3>
+                        <input type="text" id="section" name="section" class="textbar_form" placeholder="Enter Section" required>
+                    </div>
+                    <div class="co-inputs">
+
+                        <h3>Date</h3>
+                        <input type="date" id="date" name="date" required>
+
+                    </div>
+                    <div class="co-inputs">
+
+                        <h3>Course<h3>
+                        <input type="text" id="courseID" name="courseID" style="width: 85%;" placeholder="Enter Course ID" required>
+
+                        <h3>Name<h3>
+                        <input type="text" id="name" name="name" style="width: 85%;" placeholder="Enter Exam Name" required>
+                    </div>
+                    
+
+                    <div class="co-inputs">
+                        <label>CO Scores:</label>
+                        <input type="number" id="co1" name="co1" placeholder="CO1" min="0" max="100" required>
+                        <input type="number" id="co2" name="co2" placeholder="CO2" min="0" max="100" required>
+                        <input type="number" id="co3" name="co3" placeholder="CO3" min="0" max="100" required>
+                        <input type="number" id="co4" name="co4" placeholder="CO4" min="0" max="100" required>
+                        <input type="number" id="co5" name="co5" placeholder="CO5" min="0" max="100" required>
+                        <input type="number" id="co6" name="co6" placeholder="CO6" min="0" max="100" required>
+                    </div>
+                    
+
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+        
+        <script>
+            var modal = document.getElementById("uploadModal");
+            
+            var uploadBtn = document.getElementById("uploadBtn");
+            
+            // Get close button
+            var closeBtn = document.getElementById("closeBtn");
+            
+            // Listen for open click
+            uploadBtn.addEventListener("click", function() {
+                modal.style.display = "block";
+            });
+        
+            // Listen for close click
+            closeBtn.addEventListener("click", function() {
+                modal.style.display = "none";
+            });
+        
+            // Listen for outside click
+            window.addEventListener("click", function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            });
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const facultyName = urlParams.get('name');
+            const examList = urlParams.get('examList');
+        </script>
+        
+        <div>   
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Section</th>
+                <th>Name</th>
+                <th>CourseID</th>
+                <th>FacultyID</th>
+                <th>Max Marks</th>
+                <th>Date</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            {% for exam in exams %}
+            <tr>
+                <td>{{exam.year}}</td>
+                <td>{{exam.section}}</td>
+                <td>{{exam.name}}</td>
+                <td>{{exam.courseID}}</td>
+                <td>{{exam.faculty_id}}</td>
+                <td> {{exam.max_marks}}</td>
+                <td> {{ exam.date}} 
+                    <form action="/landingPage/examsDetails" method="get">
+                        <input type="hidden" name = "examID" value = {{ exam.id }}>
+                        <button>More..</button>
+                    </form>
+                </td>
+                                
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+</div>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+class Config:
+    SECRET_KEY = 'TANGO_DESERVED_BETTER'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///data.sqlite3'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
+    DEBUG = True

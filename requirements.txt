@@ -1,3 +1,4 @@
 flask
 flask-SQLAlchemy
 jinja2
+bokeh

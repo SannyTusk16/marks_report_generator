@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./style.css">
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.6.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.bokeh.org/bokeh/release/bokeh-3.6.1.min.css">
     <title>Marks Report</title>
     <style>
         body {
@@ -12,6 +14,15 @@
     padding: 0;
     background-color: #f5f5f5;
 }
+.chart {
+    background-color: #e9ecef;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    height: 300px;
+    overflow: hidden; /* Prevents content from spilling out */
+}
+
 .container {
     background-color: #f5f5f5   ;
 }
@@ -19,7 +30,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 5px;
+    padding: 5px 5px;
     background-color:white;
 }
 .top-bar-left{
@@ -164,13 +175,6 @@ table th {
             padding: 20px;
             border-radius: 10px;
         }
-        .chart {
-            background-color: #e9ecef;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            height: 300px;
-        }
         .course-outcome {
             margin-bottom: 20px;
         }
@@ -245,44 +249,16 @@ table th {
 
     <div class="content">
         <div class="left-panel">
-            <div class="chart">
-                <h4 style="margin: 5px 0px;">Course Outcome %</h4>
-                <!-- Placeholder for chart -->
-                <div style="height: 150px; border-radius: 10px; text-align: center;">
-                    <p>Bar Chart Here</p>
-                </div>
-            </div>
-
-            <div class="course-outcome">
-                <h4>CO Analysis</h4>
-                <table>
-                    <tr>
-                        <td>CO-1</td>
-                        <td>3</td>
-                        <td>90% students obtained</td>
-                    </tr>
-                    <tr>
-                        <td>CO-2</td>
-                        <td>3</td>
-                        <td>75% students obtained</td>
-                    </tr>
-                    <tr>
-                        <td>CO-3</td>
-                        <td>1</td>
-                        <td>45% students obtained</td>
-                    </tr>
-                    <tr>
-                        <td>CO-4</td>
-                        <td>1</td>
-                        <td>60% students obtained</td>
-                    </tr>
-                    <tr>
-                        <td>CO-5</td>
-                        <td>3</td>
-                        <td>85% students obtained</td>
-                    </tr>
-                </table>
-            </div>
+            <h3>Course Outcome Based Performance Metrics</h3>
+                <div style="height: 350px; border-radius: 10px; text-align: center;">
+                    <div class="chart">
+    
+                        <!-- Bokeh chart -->
+                        {{ bokeh_div|safe }}
+                    </div>
+                    {{ bokeh_script|safe }}
+                    
+                </div>  
 
             <div class="top-performers">
                 <h4>Top Performers</h4>
@@ -295,21 +271,13 @@ table th {
                         </tr>
                     </thead>
                     <tbody>
+                        {% for mark in top_marks %}
                         <tr>
                             <td>Ryan Gabriel</td>
-                            <td>19231-733-03</td>
-                            <td>29/30</td>
+                            <td>{{mark.student_id}}</td>
+                            <td>{{mark.marks}}</td>
                         </tr>
-                        <tr>
-                            <td>Ryan Gabriel</td>
-                            <td>19231-733-03</td>
-                            <td>29/30</td>
-                        </tr>
-                        <tr>
-                            <td>Ryan Gabriel</td>
-                            <td>19231-733-03</td>
-                            <td>29/30</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -326,8 +294,58 @@ table th {
             </div>
 
             <div class="report-section">
-                <!-- Placeholder for report display -->
-                <p>Report Preview Here</p>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>StudentID</th>
+                                {% for question in questions %}
+                                    <th>Q{{ question.id }} (CO{{ question.co }})</th>
+                                {% endfor %}
+                                <th>CO1</th>
+                                <th>CO2</th>
+                                <th>CO3</th>
+                                <th>CO4</th>
+                                <th>CO5</th>
+                                <th>CO6</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td class="student-id">
+                                    {{ student.studentID }}
+                                </td>
+                
+                                <!-- Static marks display for each question -->
+                                {% for question in questions %}
+                                    <td>
+                                        <!-- Display student marks for the question -->
+                                        <span class="question-marks" data-co="{{ question.co }}" 
+                                            data-student-id="{{ student.studentID }}" 
+                                            data-question-id="{{ question.id }}">
+                                            {{ student.questions.get(question.id, 0) }}
+                                        </span>
+                                    </td>
+                                {% endfor %}
+                
+                                <!-- Static CO columns -->
+                                <td><span class="co" data-co="1">{{ student.co1 }}</span></td>
+                                <td><span class="co" data-co="2">{{ student.co2 }}</span></td>
+                                <td><span class="co" data-co="3">{{ student.co3 }}</span></td>
+                                <td><span class="co" data-co="4">{{ student.co4 }}</span></td>
+                                <td><span class="co" data-co="5">{{ student.co5 }}</span></td>
+                                <td><span class="co" data-co="6">{{ student.co6 }}</span></td>
+                
+                                <!-- Total marks -->
+                                <td><span class="total">{{ student.co1 + student.co2 + student.co3 + student.co4 + student.co5 + student.co6 }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
             </div>
 
             <div class="bottom-bar">

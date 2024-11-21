@@ -2,6 +2,8 @@ from flask import render_template, request, redirect, url_for, flash, session
 from app import app, db
 from datetime import datetime
 from application.model import *
+from bokeh.plotting import figure, show, output_file
+from bokeh.embed import components
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -76,7 +78,70 @@ def examsDetails():
     faculty = Faculty.query.filter_by(id = faculty_id).first()
     examID = request.args.get('examID')
     exam = Exam.query.filter_by(id = examID).first()
-    return render_template('examDetails.html',facultyName = faculty.name,exam = exam)
+    Answers = Answer.query.filter_by(exam_id = examID).all()
+    examAttendees = len(Answers)
+    co=[0 for _ in range(6)]
+    questions = Question.query.filter_by(exam_id = examID)
+    for q in questions:
+        coAnswers = [ans for ans in Answers if ans.question_id == q.id ]
+        for i in coAnswers:
+            co[q.co-1]+=i.marks
+    for i in range(6):
+        if examAttendees!=0:
+            co_attribute = f"co{i+1}"  # Assuming `co1`, `co2`, etc., are the attribute names
+            co_value = getattr(exam, co_attribute, None)
+            co[i] = co[i]*100/(examAttendees*int(co_value))
+    COs = ['CO1','CO2', 'CO3', 'CO4', 'CO5', 'CO6']
+    p = figure(
+        x_range=COs,
+        height=280,
+        width = 430,
+        toolbar_location=None,
+        tools=""
+    )
+    Students = Student.query.filter_by(year = exam.year,section = exam.section).all()
+    p.vbar(x = COs, top = co, width = 0.9)
+    p.xgrid.grid_line_color = None
+    p.y_range.start = 0
+    script, div = components(p)
+    
+    #I cheesed it over
+    top_marks = Answer.query.order_by(Answer.marks.desc()).limit(3).all()
+    
+    stream = Stream.query.filter_by(id=faculty.stream_id).first()
+    
+    students = Student.query.filter_by(year=exam.year, section=exam.section, stream_id=stream.id).all()
+    
+    student_answers = []
+    
+    for student in students:
+        answers = Answer.query.filter_by(student_id=student.id, exam_id=exam.id).all()
+        student_answers_entry = {
+            'studentID': student.id,
+            'answers': answers,
+            'co1': 0,
+            'co2': 0,
+            'co3': 0,
+            'co4': 0,
+            'co5': 0,
+            'co6': 0,
+            'questions': {answer.question_id: answer.marks for answer in answers}
+        }
+        for answer in answers:
+            question = Question.query.filter_by(id=answer.question_id).first()
+            student_answers_entry[f'co{question.co}'] += answer.marks
+        student_answers.append(student_answers_entry)
+    
+    questions = Question.query.filter_by(exam_id=exam.id).all()
+    
+    # return render_template('test.html', bokeh_script=script, bokeh_div=div)
+    
+    return render_template('examDetails.html',
+                           facultyName = faculty.name,exam = exam,
+                           bokeh_script=script,bokeh_div=div,
+                           top_marks = top_marks,
+                           students=student_answers, 
+                           questions=questions)
 
 @app.route("/landingPage/examEdit", methods=['GET'])
 def examEdit():
@@ -133,6 +198,8 @@ def save_marks():
         mark = int(marks[i])
         question_id = int(questions[i])
         print(f"{student_id} \n {question_id} \n {mark}")
+        if (Question.query.filter_by(id = question_id).first).marks < mark:
+            continue
         answer = Answer.query.filter_by(student_id=student_id, question_id=question_id, exam_id = exam.id).first()
 
         answer.marks = int(mark)

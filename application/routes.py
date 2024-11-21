@@ -115,39 +115,30 @@ def examEdit():
         student_answers.append(student_answers_entry)
     
     questions = Question.query.filter_by(exam_id=exam.id).all()
-    
+    print(exam.id)
     return render_template('entermarks.html', facultyName=faculty.name, exam=exam, students=student_answers, questions=questions)
 
 @app.route('/save_marks', methods=['POST'])
 def save_marks():
-    questions = Question.query.filter_by(exam_id=request.form.get('examID')).all()
-    student_ids = request.form.getlist('student_ids[]')  # Get the student IDs
-    for student_id in student_ids:
-        student = Student.query.get(student_id)  # Fetch the student from the database
-        
-        # Update marks for each question for the student
-        for question in range(1, len(questions) + 1):  # Adjust the range based on your question count
-            marks = request.form.get(f'marks_{student_id}_Q{question}')
-            if marks is not None:
-                marks = float(marks)
-                # Here, you can update the marks for the student and the question
-                # Assuming you have a relationship for storing question marks
-                student.set_marks(question, marks)
-        
-        # Recalculate the COs and total marks for the student
-        co_values = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
-        
-        for question in range(1, len(questions) + 1):
-            question_marks = student.get_marks(question)
-            question_co = Question.query.get(question).co  # Assume CO is an attribute in the Question model
-            co_values[question_co] += question_marks
-        
-        # Update the CO values and total for the student
-        student.update_CO_values(co_values)
-        student.update_total_marks()
+    exam = Exam.query.filter_by(id = request.form.get('examID')).first()
+     # Retrieve arrays using getlist()
+    students = request.form.getlist('student_ids[]')
+    questions = request.form.getlist('question_ids[]')
+    marks = request.form.getlist('marks[]')
+    changesMade = len(students)
+    print(f"changesMade {changesMade}")
+    
+    for i in range(changesMade):
+        student_id = int(students[i])
+        mark = int(marks[i])
+        question_id = int(questions[i])
+        print(f"{student_id} \n {question_id} \n {mark}")
+        answer = Answer.query.filter_by(student_id=student_id, question_id=question_id, exam_id = exam.id).first()
 
-    # Commit changes to the database
-    db.session.commit()
-
-    # After saving, redirect or display a success message
-    return redirect(url_for(landingPage))
+        answer.marks = int(mark)
+        db.session.commit()
+        
+        faculty_id = session['faculty_id']
+        faculty = Faculty.query.filter_by(id=faculty_id).first()
+        
+        return render_template('examDetails.html',facultyName = faculty.name,exam = exam)

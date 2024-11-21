@@ -25,6 +25,13 @@ def create_app():
                 stream_id=default_stream.id
             )
             db.session.add(student)
+            student = Student(
+                id=2,
+                year=1,
+                section='A',
+                stream_id=default_stream.id
+            )
+            db.session.add(student)
 
         if not Faculty.query.filter_by(id=1).first():
             faculty = Faculty(
@@ -50,7 +57,14 @@ def create_app():
                 exam_id =1,
             )
             db.session.add(answer)
-
+            answer = Answer(
+                question_id=1,
+                student_id=2,
+                marks = 1,
+                exam_id =1,
+            )
+            db.session.add(answer)
+            
         if not Exam.query.filter_by(id=1).first():
             exam = Exam(
                 id=1,

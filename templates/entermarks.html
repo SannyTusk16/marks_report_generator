@@ -172,22 +172,27 @@
                     {% for student in students %}
                     <tr>
                         <td class="student-id">
-                            <input type="hidden" name="student_ids[]" value="{{ student.studentID }}">
                             {{ student.studentID }}
                         </td>
 
                         <!-- Question marks input fields -->
                         {% for question in questions %}
                             <td>
+                                <!-- Input for marks -->
                                 <input type="number" 
-                                    name="marks_{{ student.studentID }}_Q{{ question.id }}" 
+                                    name="marks[]" 
                                     value="{{ student.questions.get(question.id, 0) }}" 
                                     oninput="updateCOsAndTotal(this, {{ question.co }} , '{{ question.id }}', '{{ student.studentID }}')" 
                                     class="question-input" 
-                                    data-co="{{ question.co }}">
-                                
+                                    data-co="{{ question.co }}"
+                                    data-student-id="{{ student.studentID }}" 
+                                    data-question-id="{{ question.id }}">
+
+                                <!-- Hidden input for student ID -->
+                                <input type="hidden" name="student_ids[]" value="{{ student.studentID }}">
+
                                 <!-- Hidden input for question ID -->
-                                <input type="hidden" name="questionID_{{ question.id }}" value="{{ question.id }}">
+                                <input type="hidden" name="question_ids[]" value="{{ question.id }}">
                             </td>
                         {% endfor %}
 
@@ -206,7 +211,7 @@
                 </tbody>
             </table>
         </div>
-        <input type="hidden" name = "examID" value={{exam.ID}}>
+        <input type="hidden" name = "examID" value={{exam.id}}>
         <div class="save-exit-btn">
             <button type="submit" class="upload-btn">SAVE AND EXIT</button>
         </div>

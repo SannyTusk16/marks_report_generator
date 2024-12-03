@@ -4,6 +4,10 @@ from datetime import datetime
 from application.model import *
 from bokeh.plotting import figure, show, output_file
 from bokeh.embed import components
+from plotly.graph_objs import Bar, Figure
+import json
+import plotly
+
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -14,21 +18,31 @@ def index():
         password = request.form.get('password')
         
         faculty = Faculty.query.filter_by(id = facultyID).first()
-        
-        
-        if(faculty.passcode == password):
-            session['faculty_id'] = faculty.id
-            return redirect(url_for("landingPage"))
+        if(faculty!=None):
+            if(faculty.passcode == password):
+                session['faculty_id'] = faculty.id
+                session['faculty_name'] = faculty.name
+                return redirect(url_for("landingPage"))
         else:
             return render_template('login.html')
+        
+@app.route("/logout", methods=['POST'])
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
+
 
 @app.route("/landingPage",methods = ['GET',"POST"])
 def landingPage():
+    session['exam_id'] = None
     if(request.method == 'POST'):
         return redirect(url_for('landingPage'))
     faculty = Faculty.query.filter_by(id = session['faculty_id']).first()
     exams  = Exam.query.filter_by(faculty_id = session['faculty_id']).all()
-    return render_template('landing.html',faculty = faculty,exams = exams)
+    
+    teaches = Teaches.query.filter_by(faculty_id = session['faculty_id']).all()
+    return render_template('landing.html',faculty = faculty,exams = exams,teaches = teaches)
+
 
 @app.route('/landingPage/new-exam',methods = ['POST'])
 def new_exam():
@@ -72,46 +86,65 @@ def new_exam():
     db.session.commit()
     return render_template('landing.html',faculty = facultyID,exams = exams)
 
-@app.route("/landingPage/examsDetails", methods = ['GET'])
+
+
+@app.route("/landingPage/examsDetails", methods = ['GET','POST'])
 def examsDetails():
+    if(request.method == "POST"):
+        exam = Exam.query.filter_by(id = session["exam_id"]).first()
+        print(f"session {exam}")
+        student_s = request.form.getlist('student_ids[]')
+        question_s = request.form.getlist('question_ids[]')
+        marks = request.form.getlist('marks[]')
+        changesMade = len(student_s)
+        print(f"changesMade {changesMade}")
+        
+        for i in range(changesMade):
+            student_id = int(student_s[i])
+            mark = int(marks[i])
+            question_id = int(question_s[i])
+            print(f"{student_id} \n {question_id} \n {mark}")
+            answer = Answer.query.filter_by(student_id=student_id, question_id=question_id, exam_id = exam.id).first()
+
+            answer.marks = int(mark)
+            db.session.commit()
     faculty_id = session['faculty_id']
     faculty = Faculty.query.filter_by(id = faculty_id).first()
-    examID = request.args.get('examID')
-    exam = Exam.query.filter_by(id = examID).first()
-    Answers = Answer.query.filter_by(exam_id = examID).all()
+    if(request.method == "GET"):
+        examID = request.args.get('examID')
+        session["exam_id"] = examID 
+        exam = Exam.query.filter_by(id = examID).first()
+    Answers = Answer.query.filter_by(exam_id = exam.id).all()
     examAttendees = len(Answers)
     co=[0 for _ in range(6)]
-    questions = Question.query.filter_by(exam_id = examID)
+    questions = Question.query.filter_by(exam_id = exam.id)
     for q in questions:
         coAnswers = [ans for ans in Answers if ans.question_id == q.id ]
         for i in coAnswers:
             co[q.co-1]+=i.marks
     for i in range(6):
         if examAttendees!=0:
-            co_attribute = f"co{i+1}"  # Assuming `co1`, `co2`, etc., are the attribute names
+            co_attribute = f"co{i+1}"  
             co_value = getattr(exam, co_attribute, None)
             co[i] = co[i]*100/(examAttendees*int(co_value))
     COs = ['CO1','CO2', 'CO3', 'CO4', 'CO5', 'CO6']
-    p = figure(
-        x_range=COs,
-        height=280,
-        width = 430,
-        toolbar_location=None,
-        tools=""
+    fig = Figure(
+        data=[Bar(x=COs, y=co, marker_color='rgba(55, 128, 191, 0.6)')],
+        layout=dict(
+            title="",
+            xaxis=dict(title=""),
+            yaxis=dict(title=""),
+            height=250,
+            width=500,
+            margin=dict(l=20, r=20, t=40, b=30)
+        )
     )
-    Students = Student.query.filter_by(year = exam.year,section = exam.section).all()
-    p.vbar(x = COs, top = co, width = 0.9)
-    p.xgrid.grid_line_color = None
-    p.y_range.start = 0
-    script, div = components(p)
     
-    #I cheesed it over
+    plotly_chart_json = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    
     top_marks = Answer.query.order_by(Answer.marks.desc()).limit(3).all()
-    
     stream = Stream.query.filter_by(id=faculty.stream_id).first()
-    
     students = Student.query.filter_by(year=exam.year, section=exam.section, stream_id=stream.id).all()
-    
     student_answers = []
     
     for student in students:
@@ -133,20 +166,18 @@ def examsDetails():
         student_answers.append(student_answers_entry)
     
     questions = Question.query.filter_by(exam_id=exam.id).all()
-    
-    # return render_template('test.html', bokeh_script=script, bokeh_div=div)
-    
     return render_template('examDetails.html',
                            facultyName = faculty.name,exam = exam,
-                           bokeh_script=script,bokeh_div=div,
+                           plotly_chart_json=plotly_chart_json,
                            top_marks = top_marks,
                            students=student_answers, 
                            questions=questions)
 
+
+
 @app.route("/landingPage/examEdit", methods=['GET'])
 def examEdit():
-    examID = request.args.get('examID')
-    exam = Exam.query.filter_by(id=examID).first()
+    exam = Exam.query.filter_by(id=session['exam_id']).first()
     
     faculty_id = session['faculty_id']
     faculty = Faculty.query.filter_by(id=faculty_id).first()
@@ -182,30 +213,3 @@ def examEdit():
     questions = Question.query.filter_by(exam_id=exam.id).all()
     print(exam.id)
     return render_template('entermarks.html', facultyName=faculty.name, exam=exam, students=student_answers, questions=questions)
-
-@app.route('/save_marks', methods=['POST'])
-def save_marks():
-    exam = Exam.query.filter_by(id = request.form.get('examID')).first()
-     # Retrieve arrays using getlist()
-    students = request.form.getlist('student_ids[]')
-    questions = request.form.getlist('question_ids[]')
-    marks = request.form.getlist('marks[]')
-    changesMade = len(students)
-    print(f"changesMade {changesMade}")
-    
-    for i in range(changesMade):
-        student_id = int(students[i])
-        mark = int(marks[i])
-        question_id = int(questions[i])
-        print(f"{student_id} \n {question_id} \n {mark}")
-        if (Question.query.filter_by(id = question_id).first).marks < mark:
-            continue
-        answer = Answer.query.filter_by(student_id=student_id, question_id=question_id, exam_id = exam.id).first()
-
-        answer.marks = int(mark)
-        db.session.commit()
-        
-        faculty_id = session['faculty_id']
-        faculty = Faculty.query.filter_by(id=faculty_id).first()
-        
-        return render_template('examDetails.html',facultyName = faculty.name,exam = exam)

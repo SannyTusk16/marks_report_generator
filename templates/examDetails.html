@@ -9,160 +9,46 @@
     <title>Marks Report</title>
     <style>
         body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f5f5f5;
-}
-.chart {
-    background-color: #e9ecef;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    height: 300px;
-    overflow: hidden; /* Prevents content from spilling out */
-}
-
-.container {
-    background-color: #f5f5f5   ;
-}
-.top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 5px;
-    background-color:white;
-}
-.top-bar-left{
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-}
-.top-bar-right{
-    display: flex;
-    justify-content: space-between;
-    text-align: center;
-    align-items: center;
-}
-.top-bar button, .save-btn {
-    height:35px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-}
-.upload-btn {
-    background-color: #28a745;
-    color: white;
-    border-radius: 5px;
-    margin-left: 5px;
-    margin-right: 5px;
-    height: 33px;
-    border: none;
-    max-width: 250px;
-    padding: 0px 10px 0px 10px;
-}
-.edit-btn {
-    background-color: #dc3545;
-    color: white;
-    border-radius: 5px;
-    margin-left: 5px;
-    margin-right: 5px;
-    height: 33px;
-    border: none;
-    max-width: 250px;
-    padding: 0px 10px 0px 10px;
-}
-.exam-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0px 5px ;
-}
-.search-bar{
-    height:33px;
-    width: 500px;
-    border-radius: 5px;
-}
-.exam-details {
-    margin: 20px 0;
-}
-.exam-details h2 {
-    margin-bottom: 10px;
-}
-.roll-range {
-    padding: 20px 5px;
-    display: flex;
-    justify-content: start;
-    align-items: center;
-}
-.roll-range input {
-    padding: 10px;
-    width: 350px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-.table-container {
-    overflow : auto;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-}
-table th, table td {
-    padding: 8px;
-    border: 1px solid #ddd;
-}
-table th {
-    background-color: #f1f1f1;
-}
-.student-id, .student-name {
-    width: 150px;
-    text-align: left;
-}
-.save-exit-btn {
-    text-align: center;
-    height: 40px;
-    align-items: center;
-    margin-top: 10px;
-    border: none;
-}
-.upload-btn:hover {
-    background-color: #009c24; /* Blue on hover */
-}
-
-.edit-btn:hover {
-    background-color: #fe2e09; /* Light red on hover */
-}
-        ::-webkit-scrollbar {
-            width: 12px;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
         }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
+        .container {
+            display: flex;
+            flex-direction: column;
         }
-
-        ::-webkit-scrollbar-thumb {
-            background-color: #007bff; /* Change to your desired color */
-            border-radius: 10px;
-            border: 2px solid #f1f1f1; /* Optional: adds padding around thumb */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            height: 60px;
+            background-color: #f5f5f5;
         }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background-color: #0056b3; /* Darker color on hover */
+        .top-bar button {
+            height: 35px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
         }
-
-        /* For Firefox */
-        html {
-            scrollbar-width: thin;
-            scrollbar-color: #546f8a #f1f1f100;
-        }
-        .top-bar .back-btn {
-            background-color: #007bff;
-            color: white;
-            max-width: 250px;
+        .upload-btn, .edit-btn {
+            margin-left: 5px;
+            margin-right: 5px;
+            height: 33px;
+            border-radius: 5px;
             padding: 0px 10px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .edit-btn {
+            background-color: #dc3545;
+        }
+        .upload-btn:hover, .edit-btn:hover {
+            background-color: #009c24;
         }
         .content {
             display: flex;
@@ -174,29 +60,7 @@ table th {
             background-color: #f8f9fa;
             padding: 20px;
             border-radius: 10px;
-        }
-        .course-outcome {
-            margin-bottom: 20px;
-        }
-        .course-outcome table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .course-outcome th, .course-outcome td {
-            padding: 8px;
-            text-align: left;
-        }
-        .top-performers {
-            margin-top: 20px;
-        }
-        .top-performers table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .top-performers th, .top-performers td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .right-panel {
             flex-grow: 1;
@@ -206,23 +70,31 @@ table th {
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .report-section {
-            height: 250px;
+            margin-top: 20px;
             background-color: #f0f0f0;
             border-radius: 10px;
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 20px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        table th, table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        table th {
+            background-color: #f1f1f1;
         }
         .bottom-bar {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             margin-top: 20px;
         }
         .format-select {
             padding: 10px;
-            border: 1px solid #ddd;
             border-radius: 5px;
             width: 200px;
         }
@@ -230,35 +102,30 @@ table th {
             background-color: #28a745;
             color: white;
             padding: 10px 20px;
-            border: none;
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
         }
-            
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="top-bar">
-        <button class="back-btn">BACK</button>
-        <input type="text" class="search-bar" placeholder="Search for a student or examination">
-        <h4>{{facultyName}}</h4>
-    </div>
+    {% include 'navbar.html' %}
 
     <div class="content">
+        <!-- Left Panel -->
         <div class="left-panel">
             <h3>Course Outcome Based Performance Metrics</h3>
-                <div style="height: 350px; border-radius: 10px; text-align: center;">
-                    <div class="chart">
-    
-                        <!-- Bokeh chart -->
-                        {{ bokeh_div|safe }}
-                    </div>
-                    {{ bokeh_script|safe }}
-                    
-                </div>  
+            <div class="chart">
+                <div id="plotly-chart"></div>
+                <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                <script>
+                    // Parse the JSON data passed from Flask
+                    const plotlyChart = {{ plotly_chart_json|safe }};
+                    Plotly.newPlot('plotly-chart', plotlyChart.data, plotlyChart.layout);
+                </script>
+            </div>
 
             <div class="top-performers">
                 <h4>Top Performers</h4>
@@ -274,8 +141,8 @@ table th {
                         {% for mark in top_marks %}
                         <tr>
                             <td>Ryan Gabriel</td>
-                            <td>{{mark.student_id}}</td>
-                            <td>{{mark.marks}}</td>
+                            <td>{{ mark.student_id }}</td>
+                            <td>{{ mark.marks }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -283,69 +150,78 @@ table th {
             </div>
         </div>
 
+        <!-- Right Panel -->
         <div class="right-panel">
             <div class="top-bar">
                 <form action="/landingPage/examEdit" method="get">
+                    <div style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
+                        <h2>{{ exam.name }}</h2>
+                        <button class="edit-btn">Edit</button>
+                        
+                    </div>
                     <input type="hidden" name="examID" value="{{ exam.id }}">
-                    <button class="edit-btn">EDIT</button>
-                    <h2>{{exam.name}}</h2>
+                    
                 </form>
                 <button class="upload-btn">Upload New Sheet</button>
             </div>
 
             <div class="report-section">
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>StudentID</th>
-                                {% for question in questions %}
-                                    <th>Q{{ question.id }} (CO{{ question.co }})</th>
-                                {% endfor %}
-                                <th>CO1</th>
-                                <th>CO2</th>
-                                <th>CO3</th>
-                                <th>CO4</th>
-                                <th>CO5</th>
-                                <th>CO6</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for student in students %}
-                            <tr>
-                                <td class="student-id">
-                                    {{ student.studentID }}
-                                </td>
-                
-                                <!-- Static marks display for each question -->
-                                {% for question in questions %}
-                                    <td>
-                                        <!-- Display student marks for the question -->
-                                        <span class="question-marks" data-co="{{ question.co }}" 
-                                            data-student-id="{{ student.studentID }}" 
-                                            data-question-id="{{ question.id }}">
-                                            {{ student.questions.get(question.id, 0) }}
-                                        </span>
-                                    </td>
-                                {% endfor %}
-                
-                                <!-- Static CO columns -->
-                                <td><span class="co" data-co="1">{{ student.co1 }}</span></td>
-                                <td><span class="co" data-co="2">{{ student.co2 }}</span></td>
-                                <td><span class="co" data-co="3">{{ student.co3 }}</span></td>
-                                <td><span class="co" data-co="4">{{ student.co4 }}</span></td>
-                                <td><span class="co" data-co="5">{{ student.co5 }}</span></td>
-                                <td><span class="co" data-co="6">{{ student.co6 }}</span></td>
-                
-                                <!-- Total marks -->
-                                <td><span class="total">{{ student.co1 + student.co2 + student.co3 + student.co4 + student.co5 + student.co6 }}</span></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                
+                <table>
+                    <div class="report-section">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>StudentID</th>
+                                        {% for question in questions %}
+                                            <th>Q{{ question.id }} (CO{{ question.co }})</th>
+                                        {% endfor %}
+                                        <th>CO1</th>
+                                        <th>CO2</th>
+                                        <th>CO3</th>
+                                        <th>CO4</th>
+                                        <th>CO5</th>
+                                        <th>CO6</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                    <tr>
+                                        <td class="student-id">
+                                            {{ student.studentID }}
+                                        </td>
+                        
+                                        <!-- Static marks display for each question -->
+                                        {% for question in questions %}
+                                            <td>
+                                                <!-- Display student marks for the question -->
+                                                <span class="question-marks" data-co="{{ question.co }}" 
+                                                    data-student-id="{{ student.studentID }}" 
+                                                    data-question-id="{{ question.id }}">
+                                                    {{ student.questions.get(question.id, 0) }}
+                                                </span>
+                                            </td>
+                                        {% endfor %}
+                        
+                                        <!-- Static CO columns -->
+                                        <td><span class="co" data-co="1">{{ student.co1 }}</span></td>
+                                        <td><span class="co" data-co="2">{{ student.co2 }}</span></td>
+                                        <td><span class="co" data-co="3">{{ student.co3 }}</span></td>
+                                        <td><span class="co" data-co="4">{{ student.co4 }}</span></td>
+                                        <td><span class="co" data-co="5">{{ student.co5 }}</span></td>
+                                        <td><span class="co" data-co="6">{{ student.co6 }}</span></td>
+                        
+                                        <!-- Total marks -->
+                                        <td><span class="total">{{ student.co1 + student.co2 + student.co3 + student.co4 + student.co5 + student.co6 }}</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                    </div>  
+                </table>
             </div>
 
             <div class="bottom-bar">

@@ -16,7 +16,7 @@
             background-color: #f5f5f5;
         }
         .top-bar {
-            display: flex;
+            display: flex;  
             justify-content: space-between;
             align-items: center;
             padding: 20px 5px;
@@ -129,18 +129,7 @@
 <body>
 
 <div class="container">
-    <div class="top-bar">
-        <div class="top-bar-left">
-            <button class="upload-btn">Upload</button>
-            <button class="edit-btn">Edit Exam Details</button>
-        </div>
-        <input type="number" class="search-bar" placeholder="Search for a student or examination">
-        <div class="top-bar-right">
-            <button class="upload-btn">Save</button>
-            <i class="glyphicon glyphicon-user"></i>
-            <span>{{facultyName}}</span>
-        </div>
-    </div>
+    {% include 'navbar.html' %}
 
     <div class="exam-header">
         <div class="exam-details">
@@ -150,7 +139,7 @@
         </div>
     </div>
 
-    <form id="marks-form" action="/save_marks" method="POST">
+    <form id="marks-form" action="/landingPage/examsDetails" method="post">
         <div class="table-container">
             <table>
                 <thead>

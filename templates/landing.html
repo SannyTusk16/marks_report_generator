@@ -172,145 +172,173 @@
         .status-live {
             background-color: #d9534f;
         }
+
     </style>
 </head>
 <body>
 
-    <center>
-        <h1>Welcome  {{ faculty.name }}</h1>
-    </center>
+    {% include 'navbar.html' %}
 
-<div class="container">
-    <div class="top-bar">
-        <div class="container">
-            <div class="top-bar">
-                <button class="upload-btn" id="uploadBtn">New Exam</button>
-                <button class="edit-btn">Edit Exam Details</button>
-                <input type="text" class="search-bar" placeholder="Search for a student or examination">
+    <div class="container">
+        <div class="top-bar">
+            <div class="container">
+                <div class="top-bar">
+                    <button class="upload-btn" id="uploadBtn">New Exam</button>
+                    <button class="edit-btn">Edit Exam Details</button>
+                    <input type="text" class="search-bar" placeholder="Search for a student or examination">
+                </div>
+            
+                <!-- Add your table or other content here -->
             </div>
-        
-            <!-- Add your table or other content here -->
-        </div>
-        
-        <!-- The Modal -->
-        <div id="uploadModal" class="modal">
-            <div class="modal-content">
-                <span id="closeBtn" class="close-btn">&times;</span>
-                <h2>Upload Exam Details</h2>
-                <form id="uploadForm" action="/landingPage/new-exam" method="post">
-                    <div class="co-inputs">
-                        <h3>Year</h3>
-                        <select id="year" name="year" required>
-                            <option value=1>1st Year</option>
-                            <option value=2>2nd Year</option>
-                            <option value=3>3rd Year</option>
-                            <option value=4>4th Year</option>
-                        </select>
+            
+            <!-- The Modal -->
+            <div id="uploadModal" class="modal">
+                <div class="modal-content">
+                    <span id="closeBtn" class="close-btn">&times;</span>
+                    <h2>Upload Exam Details</h2>
+                    <form id="uploadForm" action="/landingPage/new-exam" method="post">
+                        <div class="co-inputs">
+                            <h3>Year</h3>
+                            <select id="year" name="year" required>
+                                <option value=1>1st Year</option>
+                                <option value=2>2nd Year</option>
+                                <option value=3>3rd Year</option>
+                                <option value=4>4th Year</option>
+                            </select>
+                            
+                            <h3>Section</h3>
+                            <input type="text" id="section" name="section" class="textbar_form" placeholder="Enter Section" required>
+                        </div>
+                        <div class="co-inputs">
+
+                            <h3>Date</h3>
+                            <input type="date" id="date" name="date" required>
+
+                        </div>
+                        <div class="co-inputs">
+
+                            <h3>Course<h3>
+                            <input type="text" id="courseID" name="courseID" style="width: 85%;" placeholder="Enter Course ID" required>
+
+                            <h3>Name<h3>
+                            <input type="text" id="name" name="name" style="width: 85%;" placeholder="Enter Exam Name" required>
+                        </div>
                         
-                        <h3>Section</h3>
-                        <input type="text" id="section" name="section" class="textbar_form" placeholder="Enter Section" required>
-                    </div>
-                    <div class="co-inputs">
 
-                        <h3>Date</h3>
-                        <input type="date" id="date" name="date" required>
+                        <div class="co-inputs">
+                            <label>CO Scores:</label>
+                            <input type="number" id="co1" name="co1" placeholder="CO1" min="0" max="100" required>
+                            <input type="number" id="co2" name="co2" placeholder="CO2" min="0" max="100" required>
+                            <input type="number" id="co3" name="co3" placeholder="CO3" min="0" max="100" required>
+                            <input type="number" id="co4" name="co4" placeholder="CO4" min="0" max="100" required>
+                            <input type="number" id="co5" name="co5" placeholder="CO5" min="0" max="100" required>
+                            <input type="number" id="co6" name="co6" placeholder="CO6" min="0" max="100" required>
+                        </div>
+                        
 
-                    </div>
-                    <div class="co-inputs">
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+            
+            <script>
+                var modal = document.getElementById("uploadModal");
+                
+                var uploadBtn = document.getElementById("uploadBtn");
+                
+                // Get close button
+                var closeBtn = document.getElementById("closeBtn");
+                
+                // Listen for open click
+                uploadBtn.addEventListener("click", function() {
+                    modal.style.display = "block";
+                });
+            
+                // Listen for close click
+                closeBtn.addEventListener("click", function() {
+                    modal.style.display = "none";
+                });
+            
+                // Listen for outside click
+                window.addEventListener("click", function(event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                });
 
-                        <h3>Course<h3>
-                        <input type="text" id="courseID" name="courseID" style="width: 85%;" placeholder="Enter Course ID" required>
-
-                        <h3>Name<h3>
-                        <input type="text" id="name" name="name" style="width: 85%;" placeholder="Enter Exam Name" required>
-                    </div>
-                    
-
-                    <div class="co-inputs">
-                        <label>CO Scores:</label>
-                        <input type="number" id="co1" name="co1" placeholder="CO1" min="0" max="100" required>
-                        <input type="number" id="co2" name="co2" placeholder="CO2" min="0" max="100" required>
-                        <input type="number" id="co3" name="co3" placeholder="CO3" min="0" max="100" required>
-                        <input type="number" id="co4" name="co4" placeholder="CO4" min="0" max="100" required>
-                        <input type="number" id="co5" name="co5" placeholder="CO5" min="0" max="100" required>
-                        <input type="number" id="co6" name="co6" placeholder="CO6" min="0" max="100" required>
-                    </div>
-                    
-
-                    <button type="submit">Submit</button>
-                </form>
+                const urlParams = new URLSearchParams(window.location.search);
+                const facultyName = urlParams.get('name');
+                const examList = urlParams.get('examList');
+            </script>
+            
+            <div>   
             </div>
         </div>
-        
-        <script>
-            var modal = document.getElementById("uploadModal");
-            
-            var uploadBtn = document.getElementById("uploadBtn");
-            
-            // Get close button
-            var closeBtn = document.getElementById("closeBtn");
-            
-            // Listen for open click
-            uploadBtn.addEventListener("click", function() {
-                modal.style.display = "block";
-            });
-        
-            // Listen for close click
-            closeBtn.addEventListener("click", function() {
-                modal.style.display = "none";
-            });
-        
-            // Listen for outside click
-            window.addEventListener("click", function(event) {
-                if (event.target == modal) {
-                    modal.style.display = "none";
-                }
-            });
+        <div style="display: flex;flex-direction: row;">
+            <table>
+                <h1>Exams</h1>
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Section</th>
+                        <th>Name</th>
+                        <th>CourseID</th>
+                        <th>FacultyID</th>
+                        <th>Max Marks</th>
+                        <th>Date</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam in exams %}
+                    <tr>
+                        <td>{{exam.year}}</td>
+                        <td>{{exam.section}}</td>
+                        <td>{{exam.name}}</td>
+                        <td>{{exam.courseID}}</td>
+                        <td>{{exam.faculty_id}}</td>
+                        <td> {{exam.max_marks}}</td>
+                        <td> {{ exam.date}} 
+                            <form action="/landingPage/examsDetails" method="get">
+                                <input type="hidden" name = "examID" value = {{ exam.id }}>
+                                <button>More..</button>
+                            </form>
+                        </td>
+                                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const facultyName = urlParams.get('name');
-            const examList = urlParams.get('examList');
-        </script>
-        
-        <div>   
+
+            <table>
+                <h1>Classes</h1>
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Section</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for teach in teach %}
+                    <tr>
+                        <td>{{teach.year}}</td>
+                        <td>{{teach.section}}</td> 
+                            <form action="/landingPage/examsDetails" method="get">
+                                <input type="hidden" name = "examID" value = {{ exam.id }}>
+                                <button>More..</button>
+                            </form>
+                        </td>
+                                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            
         </div>
+        
     </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Year</th>
-                <th>Section</th>
-                <th>Name</th>
-                <th>CourseID</th>
-                <th>FacultyID</th>
-                <th>Max Marks</th>
-                <th>Date</th>
-                
-            </tr>
-        </thead>
-        <tbody>
-            {% for exam in exams %}
-            <tr>
-                <td>{{exam.year}}</td>
-                <td>{{exam.section}}</td>
-                <td>{{exam.name}}</td>
-                <td>{{exam.courseID}}</td>
-                <td>{{exam.faculty_id}}</td>
-                <td> {{exam.max_marks}}</td>
-                <td> {{ exam.date}} 
-                    <form action="/landingPage/examsDetails" method="get">
-                        <input type="hidden" name = "examID" value = {{ exam.id }}>
-                        <button>More..</button>
-                    </form>
-                </td>
-                                
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
-</div>
 
 </body>
 </html>

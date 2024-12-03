@@ -33,6 +33,7 @@ class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     year = db.Column(db.Integer, nullable=False)
     section = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False)
     stream_id = db.Column(db.Integer, db.ForeignKey('stream.id'), nullable=False)
     
     # Relationships
@@ -58,6 +59,7 @@ class Faculty(db.Model):
 
 class Teaches(db.Model):
     __tablename__ = 'teaches'
+    id = db.Column(db.Integer, primary_key=True)
     faculty_id = db.Column(db.Integer, db.ForeignKey('faculty.id'), primary_key=True)
     year = db.Column(db.Integer, primary_key=True, nullable=False)
     section = db.Column(db.String, primary_key=True, nullable=False)

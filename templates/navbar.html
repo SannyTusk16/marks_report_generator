@@ -1,0 +1,88 @@
+<style>
+    .navbar {
+        background-color: #f2f2f2;
+        color:#47584f;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: Arial, sans-serif;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .navbar-container {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .navbar-left,
+    .navbar-center,
+    .navbar-right {
+        display: flex;
+        align-items: center;
+    }
+
+    .site-name {
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    .faculty-name {
+        margin-left: 20px;
+        font-size: 50px;
+    }
+
+    .navbar-right {
+        gap: 15px;
+    }
+
+    .nav-link {
+        color: white;
+        text-decoration: none;
+        font-size: 1em;
+        padding: 5px 10px;
+        border-radius: 5px;
+        background-color: #555;
+        transition: background-color 0.3s;
+    }
+
+    .nav-link:hover {
+        background-color: #777;
+    }
+
+    .logout-btn {
+        color: white;
+        font-size: 1em;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #d9534f;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .logout-btn:hover {
+        background-color: #c9302c;
+    }
+</style>
+
+<nav class="navbar">
+    <div class="navbar-container">
+        <div class="navbar-left">
+            <span class="site-name">Moody Blues</span>
+        </div>
+        <div class="navbar-center">
+            <span class="faculty-name"><strong>{{ session["faculty_name"] }}</strong></span>
+        </div>
+        <div class="navbar-right">
+            <a href="/landingPage" class="nav-link">Home</a>
+            <form action="/logout" method="post" style="display: inline;">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </div>
+</nav>

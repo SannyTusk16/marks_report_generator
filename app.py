@@ -1,13 +1,22 @@
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for, jsonify
 from application.config import Config
 from application.database import db
 from application.model import *
 from datetime import date
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+
+
+
+
+# Configure the secret key for JWT
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
+    app.config['JWT_SECRET_KEY'] = 'your_secret_key'  # Change this to a secure key
+    jwt = JWTManager(app)
+
 
     with app.app_context():
         db.create_all()
@@ -22,6 +31,7 @@ def create_app():
                 id=1,
                 year=1,
                 section='A',
+                name = 'Sanji',
                 stream_id=default_stream.id
             )
             db.session.add(student)
@@ -29,6 +39,7 @@ def create_app():
                 id=2,
                 year=1,
                 section='A',
+                name='Jack Cooper',
                 stream_id=default_stream.id
             )
             db.session.add(student)
@@ -87,6 +98,22 @@ def create_app():
                 marks =1
             )
             db.session.add(question)
+        
+        if not Teaches.query.filter_by(id=1).first():
+            teaches = Teaches(
+                id=1,
+                faculty_id=1,
+                year=1,
+                section="A",
+                course_id=1,
+            )
+            db.session.add(teaches)
+        
+        if not Course.query.filter_by(course_id=1).first():
+            course = Course(
+                course_id=1,
+                stream_id=default_stream.id
+            )
 
         db.session.commit()
     

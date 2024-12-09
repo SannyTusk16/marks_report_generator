@@ -1,0 +1,33 @@
+<h2>Search Results</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Year</th>
+            <th>Section</th>
+            <th>Name</th>
+            <th>CourseID</th>
+            <th>FacultyID</th>
+            <th>Max Marks</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for exam in exams %}
+        <tr>
+            <td>{{ exam.year }}</td>
+            <td>{{ exam.section }}</td>
+            <td>{{ exam.name }}</td>
+            <td>{{ exam.courseID }}</td>
+            <td>{{ exam.faculty_id }}</td>
+            <td>{{ exam.max_marks }}</td>
+            <td>
+                {{ exam.date }}
+                <form action="/landingPage/examsDetails" method="get">
+                    <input type="hidden" name="examID" value="{{ exam.id }}">
+                    <button type="submit">More..</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

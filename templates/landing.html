@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/htmx.org@2.0.3"></script>
     <title>Marks Report Generator</title>
     <style>
         body {
@@ -172,6 +173,17 @@
         .status-live {
             background-color: #d9534f;
         }
+        .loading-indicator {
+            display: none;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .search-bar:focus + .loading-indicator {
+            display: block;
+        }
 
     </style>
 </head>
@@ -184,8 +196,14 @@
             <div class="container">
                 <div class="top-bar">
                     <button class="upload-btn" id="uploadBtn">New Exam</button>
-                    <button class="edit-btn">Edit Exam Details</button>
-                    <input type="text" class="search-bar" placeholder="Search for a student or examination">
+                    <input type="text" 
+                        class="search-bar" 
+                        placeholder="Search for an Exam"
+                        hx-get="/search/exams" 
+                        hx-trigger="keyup changed delay:300ms" 
+                        hx-target="#exam-results" 
+                        hx-indicator=".loading-indicator"
+                        style="margin-right: 10px;">
                 </div>
             
                 <!-- Add your table or other content here -->
@@ -274,9 +292,10 @@
             <div>   
             </div>
         </div>
-        <div style="display: flex;flex-direction: row;">
-            <table>
-                <h1>Exams</h1>
+        <div style="display: flex;flex-direction: row;justify-content: space-around;">
+            <div style="display: flex;flex-direction: column;">
+                <h1 id="exam-results">Exams</h1>
+                <table>
                 <thead>
                     <tr>
                         <th>Year</th>
@@ -301,7 +320,7 @@
                         <td> {{ exam.date}} 
                             <form action="/landingPage/examsDetails" method="get">
                                 <input type="hidden" name = "examID" value = {{ exam.id }}>
-                                <button>More..</button>
+                                <button type="submit">More..</button>
                             </form>
                         </td>
                                         
@@ -310,9 +329,12 @@
                 </tbody>
             </table>
 
+            </div>
+           
 
-            <table>
+            <div style="display: flex;flex-direction: column;">
                 <h1>Classes</h1>
+                <table>
                 <thead>
                     <tr>
                         <th>Year</th>
@@ -320,13 +342,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for teach in teach %}
+                    {% for teach in teaches %}
                     <tr>
                         <td>{{teach.year}}</td>
-                        <td>{{teach.section}}</td> 
-                            <form action="/landingPage/examsDetails" method="get">
-                                <input type="hidden" name = "examID" value = {{ exam.id }}>
-                                <button>More..</button>
+                        <td>{{teach.section}} 
+                            <form action="/landingPage/class" method="get">
+                                <input type="hidden" name = "examID" value = {{ session["exam_id"] }}>
+                                <input type="hidden" name = "year" value = {{ teach.year }}>
+                                <input type="hidden" name = "section" value = {{ teach.section }}>
+                                <input type="hidden" name = "course_id" value = {{ teach.course_id }}>
+                                <button type="submit">More</button>
                             </form>
                         </td>
                                         
@@ -334,6 +359,9 @@
                     {% endfor %}
                 </tbody>
             </table>
+            </div>
+            
+                
             
             
         </div>

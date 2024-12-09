@@ -22,8 +22,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 5px;
-            height: 60px;
+            padding-left: 15px;
             background-color: #f5f5f5;
         }
         .top-bar button {
@@ -140,7 +139,7 @@
                     <tbody>
                         {% for mark in top_marks %}
                         <tr>
-                            <td>{{mark.student_name}}</td>
+                            <td>{{ mark.student_name}}</td>
                             <td>{{ mark.student_id }}</td>
                             <td>{{ mark.marks }}</td>
                         </tr>
@@ -153,71 +152,31 @@
         <!-- Right Panel -->
         <div class="right-panel">
             <div class="top-bar">
-                <h2>{{ exam.name }}</h2>
-                <form action="/landingPage/examEdit" method="get">
-                    <div style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
-                        
-                        <button class="edit-btn">Edit</button>
-                        
-                    </div>
-                    <input type="hidden" name="examID" value="{{ exam.id }}">
-                    
-                </form>
+                <h2>Course ID :{{ teaches.course_id}} <br>Section :{{ teaches.section }}<br> Year:{{ teaches.year }}    </h2>
             </div>
 
             <div class="report-section">
                 <table>
                     <div class="report-section">
                         <div class="table-container">
-                            <table id="co-table">
+                            <table>
                                 <thead>
                                     <tr>
-                                        <th>StudentID</th>
-                                        <th>StudentName</th>
-                                        {% for question in questions %}
-                                            <th>Q{{ question.id }} (CO{{ question.co }})</th>
-                                        {% endfor %}
-                                        <th>CO1</th>
-                                        <th>CO2</th>
-                                        <th>CO3</th>
-                                        <th>CO4</th>
-                                        <th>CO5</th>
-                                        <th>CO6</th>
-                                        <th>Total</th>
+                                        <th>Student Name</th>
+                                        <th>Best CO</th>
+                                        <th>Worst CO</th>
+                                        <th>Average CO Score</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for student in students %}
+                                    {% for student in minmaxStudentCOs %}
                                     <tr>
-                                        <td class="student-id">
-                                            {{ student.studentID }}
-                                        </td>
-
                                         <td class="student-id">
                                             {{ student.student_name }}
                                         </td>
-                                        <!-- Static marks display for each question -->
-                                        {% for question in questions %}
-                                            <td>
-                                                <!-- Display student marks for the question -->
-                                                <span class="question-marks" data-co="{{ question.co }}" 
-                                                    data-student-id="{{ student.studentID }}" 
-                                                    data-question-id="{{ question.id }}">
-                                                    {{ student.questions.get(question.id, 0) }}
-                                                </span>
-                                            </td>
-                                        {% endfor %}
-                        
-                                        <!-- Static CO columns -->
-                                        <td><span class="co" data-co="1">{{ student.co1 }}</span></td>
-                                        <td><span class="co" data-co="2">{{ student.co2 }}</span></td>
-                                        <td><span class="co" data-co="3">{{ student.co3 }}</span></td>
-                                        <td><span class="co" data-co="4">{{ student.co4 }}</span></td>
-                                        <td><span class="co" data-co="5">{{ student.co5 }}</span></td>
-                                        <td><span class="co" data-co="6">{{ student.co6 }}</span></td>
-                        
-                                        <!-- Total marks -->
-                                        <td><span class="total">{{ student.co1 + student.co2 + student.co3 + student.co4 + student.co5 + student.co6 }}</span></td>
+                                        <td><span class="co" data-co="1">{{ student.max_co }}</span></td>
+                                        <td><span class="co" data-co="2">{{ student.min_co }}</span></td>
+                                        <td><span class="total">{{ student.avg_co }}</span></td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -227,68 +186,9 @@
                     </div>  
                 </table>
             </div>
-
-            <div class="bottom-bar">
-                <select class="format-select">
-                    <option value="" disabled selected>-- select format --</option>
-                    <option value="csv">CSV</option>
-                    <option value="excel">Excel</option>
-                </select>
-                <button class="download-btn">DOWNLOAD REPORT</button>
-            </div>
-            
         </div>
     </div>
 </div>
-<script>
-    document.querySelector('.download-btn').addEventListener('click', function () {
-    const format = document.querySelector('.format-select').value;
-    if (!format) {
-        alert("Please select a format to download.");
-        return;
-    }
-
-    // Target the CO table explicitly
-    const table = document.querySelector('#co-table'); // Use the unique ID
-    if (!table) {
-        alert("CO table not found!");
-        return;
-    }
-
-    // Parse headers
-    const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim());
-
-    // Parse rows
-    const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => {
-        const cells = Array.from(tr.querySelectorAll('td')).map(td => td.innerText.trim());
-        return Object.fromEntries(headers.map((header, i) => [header, cells[i]]));
-    });
-
-    // Send data to Flask for download
-    fetch('/download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ format, table_data: rows })
-    }).then(response => {
-        if (response.ok) {
-            return response.blob();
-        } else {
-            alert("Failed to generate file.");
-        }
-    }).then(blob => {
-        if (blob) {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `co_table_report.${format === 'excel' ? 'xlsx' : 'csv'}`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-        }
-    }).catch(err => console.error(err));
-});
-
-</script>
 
 </body>
 </html>
